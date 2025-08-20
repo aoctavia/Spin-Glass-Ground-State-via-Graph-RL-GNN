@@ -46,7 +46,7 @@ Poster-ready figures are included in [`figs/`](./figs).
 ├── src/                      # Modular code (envs, models, baselines, utils)
 ├── results/                  # Checkpoints, evaluation stats, CSV summaries
 ├── figs/                     # Training/evaluation plots (poster-ready)
-├── poster.pdf                # One-page project poster (optional)
+├── paperwork.pdf             # draft paper from this project
 ├── requirements.txt          # Python dependencies
 ├── LICENSE
 └── README.md
