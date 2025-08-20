@@ -1,3 +1,8 @@
+---
+title: Statistics
+math: true
+---
+
 ## Statistical Formulation & Equations
 
 ### 1. Spin Glass Hamiltonian
