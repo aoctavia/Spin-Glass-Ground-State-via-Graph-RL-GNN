@@ -1,0 +1,22 @@
+# Experiment Suite Report
+
+- **generalization / grid / mean_RL**: -3.000
+- **generalization / grid / mean_RL_refine**: -64.400
+- **generalization / grid / mean_SA**: -75.600
+- **generalization / reg3 / mean_RL**: 3.000
+- **generalization / reg3 / mean_RL_refine**: -68.200
+- **generalization / reg3 / mean_SA**: -69.400
+- **generalization / er / mean_RL**: -9.800
+- **generalization / er / mean_RL_refine**: -161.000
+- **generalization / er / mean_SA**: -190.200
+- **scaling / er / RL_last**: 0.010
+- **scaling / er / RLref_last**: -0.247
+- **scaling / er / SA_last**: -0.246
+- **ablation / er_small / mean_base**: 1.000
+- **ablation / er_small / mean_noJ**: 1.000
+- **ablation / er_small / mean_noDeg**: 5.500
+- **small_er / er_small / mean_H_RL**: 5.875
+- **small_er / er_small / mean_H_SA**: -34.375
+- **small_er / er_small / mean_gap_RL_vs_ILP**: 1.172
+- **large_er / er_large / mean_H_RL**: 1.750
+- **large_er / er_large / mean_H_SA**: -185.000

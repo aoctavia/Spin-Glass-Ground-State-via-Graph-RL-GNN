@@ -1,0 +1,6 @@
+split,metric,value
+small_ER,mean_H_rl,-1.875
+small_ER,mean_H_sa,-34.375
+small_ER,mean_gap_rl_vs_ilp,0.9445409235558024
+large_ER,mean_H_rl,1.75
+large_ER,mean_H_sa,-185.0
