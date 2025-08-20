@@ -1,0 +1,30 @@
+# Core scientific stack
+numpy
+scipy
+matplotlib
+seaborn
+networkx
+tqdm
+einops
+
+# Optimization
+ortools
+
+# PyTorch & GNN
+torch
+torchvision
+torchaudio
+torch-geometric
+torch-scatter
+torch-sparse
+torch-cluster
+torch-spline-conv
+
+# Optional quantum baseline
+qiskit
+pennylane
+
+# Jupyter (for notebooks)
+jupyter
+notebook
+ipykernel
