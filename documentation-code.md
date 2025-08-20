@@ -1,161 +1,220 @@
 # Summary
+
 ---
 
 ### Cell 1 — Setup & Installs
 
-* **Isi:** Install `numpy/scipy/matplotlib/seaborn/networkx/tqdm/einops/ortools` + PyTorch Geometric (PyG) via wheels.
-* **Tujuan:** Menyediakan semua dependensi untuk simulasi graf, baseline (ILP/SA), dan model GNN.
-
-### Cell 2 — Imports, Config, Reproducibility
-
-* **Isi:** Import library, set seed, definisi `DEVICE`, dan kamus konfigurasi `CFG`.
-* **Tujuan:** Menjamin eksperimen **reproducible** dan parameter terpusat (ukuran graf, epoch, lr, dsb).
-
-### Cell 3 — Graph Generators (ER, Grid, 3‑Regular) + Couplings
-
-* **Isi:** Fungsi pembuat graf **Erdős–Rényi**, **grid** L×L, dan **k‑regular**, dengan **coupling spin-glass** $J∈{−1,+1}$.
-* **Tujuan:** Membangun instansi masalah (graf + couplings) yang beragam untuk training & evaluasi.
-
-### Cell 4 — PyG Data & Energi
-
-* **Isi:** Konversi graf → `torch_geometric.data.Data` (fitur node + `edge_weight=J`), fungsi energi dan Δenergi.
-* **Tujuan:** Representasi data yang kompatibel dengan **GNN** dan fungsi objektif fisika (Hamiltonian Ising).
-
-### Cell 5 — EDA Topologi & Couplings
-
-* **Isi:** Plot histogram derajat, distribusi J, dan visualisasi topologi.
-* **Tujuan:** **Eksplorasi data** untuk memahami karakter graf yang akan dipakai model.
-
-### Cell 6 — Baseline: Simulated Annealing (SA)
-
-* **Isi:** Implementasi SA dengan pendinginan geometrik dan evaluasi cepat.
-* **Tujuan:** Baseline **heuristik** yang kuat untuk dibandingkan dengan RL+GNN.
-
-### Cell 7 — Baseline: Exact ILP (Max‑Cut Mapping)
-
-* **Isi:** Formulasi **CP‑SAT** OR‑Tools untuk Max‑Cut (mapping dari energi spin-glass), kembalikan energi optimal.
-* **Tujuan:** Pembanding **optimal** (untuk graf kecil) agar bisa mengukur **gap** RL terhadap optimum.
-
-### Cell 8 — RL Environment (Sequential Assignment)
-
-* **Isi:** Environment konstruksi spin: assign spin per node, **reward shaping** $r_t = −ΔH$.
-* **Tujuan:** Menjadikan ground-state search sebagai **episodic RL** dengan reward lokal yang stabil.
-
-### Cell 9 — Policy‑Value GNN (A2C‑style)
-
-* **Isi:** GCN backbone dengan `edge_weight=J`, **policy head** (logits untuk −1/+1) dan **value head** (V(s)).
-* **Tujuan:** Arsitektur **actor‑critic** yang memahami struktur graf & bobot couplings.
-
-### Cell 10 — Instance Generator & Permutation Augmentation
-
-* **Isi:** Utilitas membuat instansi graf sesuai tipe + augmentasi **permute nodes**.
-* **Tujuan:** **Generalization** dan **invariance** terhadap pelabelan node (tidak overfit ke index).
-
-### Cell 11 — A2C Training Loop (Actor‑Critic)
-
-* **Isi:** Pelatihan A2C sederhana (policy loss + value loss + entropy reg + grad clip), **curriculum sizes**.
-* **Tujuan:** Melatih kebijakan GNN untuk **meminimalkan energi** secara stabil dan tidak collapse.
-
-### Cell 12 — Training Curves
-
-* **Isi:** Plot **mean energy** & **mean return** per epoch.
-* **Tujuan:** Memantau kemajuan training dan mendeteksi stagnasi/overfitting.
-
-### Cell 13 — Greedy Inference (RL Policy)
-
-* **Isi:** Evaluasi kebijakan dengan aksi **greedy**; bandingkan dengan SA pada satu instansi.
-* **Tujuan:** Lihat kualitas kebijakan RL secara deterministik saat inference.
-
-### Cell 14 — Batch Evaluation (+ILP untuk kecil)
-
-* **Isi:** Evaluasi batch: **RL vs SA**; untuk graf kecil, tambahkan **ILP** dan hitung **relative gap**.
-* **Tujuan:** Menilai performa rata‑rata dan **seberapa dekat RL ke optimum**.
-
-### Cell 15 — Visualisasi Hasil Evaluasi
-
-* **Isi:** Boxplot **RL vs SA** (small & large), histogram **gap RL–ILP**.
-* **Tujuan:** **Analisis komparatif** yang mudah disampaikan di laporan/poster.
-
-### Cell 16 — Save Artifacts
-
-* **Isi:** Simpan `state_dict` model, `train_history.json`, dan statistik evaluasi (`.npz`).
-* **Tujuan:** **Reproducibility** dan kemudahan publikasi ke repo/portofolio.
-
-### Cell 17 — (Optional) Ganti Backbone ke GIN
-
-* **Isi:** Implementasi **PolicyValueGIN** (lebih ekspresif dari GCN).
-* **Tujuan:** **Ablasi arsitektur** untuk melihat pengaruh kapasitas GNN.
-
-### Cell 18 — Notes & Next Steps (Markdown)
-
-* **Isi:** Daftar ide peningkatan: A2C penuh, curriculum/topologi campur, QAOA bridge, dsb.
-* **Tujuan:** Peta **riset lanjutan** agar proyek tampak berkembang dan visioner.
-
-### Cell 19 — Checkpointing & Utils
-
-* **Isi:** Kelas `Timer`, fungsi `save_ckpt`/`load_ckpt`, direktori `checkpoints/` & `artifacts/`.
-* **Tujuan:** **Manajemen eksperimen** (resume, simpan best model).
-
-### Cell 20 — Validasi Set & Early‑Stopping
-
-* **Isi:** `VALSET`, fungsi `mean_val_energy`, dan **training A2C dengan early‑stopping**.
-* **Tujuan:** Mencegah **overfitting**, memilih model terbaik berdasar **val energy**.
-
-### Cell 21 — Plot Loss Terms & Val Energy
-
-* **Isi:** Kurva **policy/value/entropy** dan **train vs val energy**.
-* **Tujuan:** Diagnostik **stabilitas pelatihan** dan trade‑off regularisasi.
-
-### Cell 22 — Local Refinement (Zero‑T Hill‑Climb)
-
-* **Isi:** Refinement **greedy 1‑opt** pada output RL.
-* **Tujuan:** **Post‑processing** murah yang sering memberi penurunan energi ekstra.
-
-### Cell 23 — Cross‑Topology Generalization
-
-* **Isi:** Evaluasi **Grid** & **3‑regular** (RL, RL+refine, SA) + boxplot.
-* **Tujuan:** Uji **transfer** antar topologi (indikator robust/general).
-
-### Cell 24 — Size Scaling Study
-
-* **Isi:** Kurva **energy per edge vs n** untuk RL, RL+refine, SA.
-* **Tujuan:** Analisis **skaling** performa seiring ukuran graf membesar.
-
-### Cell 25 — Ablation Tests
-
-* **Isi:** Evaluasi tanpa bobot $J$ atau tanpa fitur derajat.
-* **Tujuan:** Menilai **komponen penting** pada representasi (apa yang benar‑benar membantu).
-
-### Cell 26 — Mini Hyper‑Parameter Sweep
-
-* **Isi:** Sweep kecil (hidden size, entropy coef) + early‑stopping per konfigurasi.
-* **Tujuan:** **Tuning ringan** yang terstruktur untuk peningkatan performa.
-
-### Cell 27 — Save Best Model & CSV Summary
-
-* **Isi:** Simpan **checkpoint final**, `train_history2.json`, dan **ringkasan CSV** metrik inti.
-* **Tujuan:** Siap dipakai untuk **README/poster** dan perbandingan antar run.
-
-### Cell 28 — (Opsional) QAOA Baseline (p=1)
-
-* **Isi:** Jika `qiskit` tersedia, hitung **QAOA p=1** untuk graf kecil; bandingkan dengan RL/SA.
-* **Tujuan:** **Jembatan ke quantum algorithms**, relevan dengan call (combinatorial + quantum).
-
-### Cell 29 — Quick Report (Markdown)
-
-* **Isi:** Generate laporan singkat otomatis dari hasil evaluasi.
-* **Tujuan:** Memudahkan **penulisan mini‑paper/poster** dengan angka yang konsisten.
-
-### Cell 30 — Export Figures (Poster‑Ready)
-
-* **Isi:** Simpan ulang figur kunci (kurva energi, scaling) ke folder `figs/`.
-* **Tujuan:** **Siap presentasi** (paper/poster) tanpa perlu re‑plot manual.
+* **Content:** Install `numpy/scipy/matplotlib/seaborn/networkx/tqdm/einops/ortools` + PyTorch Geometric (PyG) via wheels.
+* **Purpose:** Provide all dependencies for graph simulation, baselines (ILP/SA), and GNN models.
 
 ---
 
-## Gambaran besar (tujuan proyek)
+### Cell 2 — Imports, Config, Reproducibility
 
-* **Formulasi fisika → optimisasi:** Menyelesaikan ground state spin glass (Hamiltonian Ising) sebagai problem **Max‑Cut**.
-* **Metode ML yang fisika-aware:** **GNN + RL (A2C)** memanfaatkan struktur graf dan couplings $J$.
-* **Rigor eksperimen:** Baseline **SA**, pembanding **ILP (optimal)**, **refinement lokal**, dan **uji generalisasi** (topologi, ukuran).
-* **Kesiapan portofolio:** Artifacts, checkpoint, CSV, **report** dan **figures** → mudah dipaketkan ke **GitHub** dan **poster**.
+* **Content:** Import libraries, set random seed, define `DEVICE`, and central config dictionary `CFG`.
+* **Purpose:** Ensure experiments are **reproducible** with centralized parameters (graph size, epochs, learning rate, etc.).
+
+---
+
+### Cell 3 — Graph Generators (ER, Grid, 3-Regular) + Couplings
+
+* **Content:** Functions to generate **Erdős–Rényi**, **grid** \$L \times L\$, and **k-regular** graphs, with **spin-glass couplings** \$J \in {-1,+1}\$.
+* **Purpose:** Build diverse problem instances (graph + couplings) for training and evaluation.
+
+---
+
+### Cell 4 — PyG Data & Energy
+
+* **Content:** Convert graph → `torch_geometric.data.Data` (node features + `edge_weight=J`), define energy and \$\Delta\$energy functions.
+* **Purpose:** Provide a representation compatible with **GNNs** and the physical objective (Ising Hamiltonian).
+
+---
+
+### Cell 5 — EDA: Topology & Couplings
+
+* **Content:** Plot degree histogram, \$J\$ distribution, and visualize topologies.
+* **Purpose:** **Explore data** to understand the characteristics of graphs used for training.
+
+---
+
+### Cell 6 — Baseline: Simulated Annealing (SA)
+
+* **Content:** Implement SA with geometric cooling and quick evaluation.
+* **Purpose:** A strong **heuristic baseline** for comparison against RL+GNN.
+
+---
+
+### Cell 7 — Baseline: Exact ILP (Max-Cut Mapping)
+
+* **Content:** Formulate **CP-SAT** OR-Tools for Max-Cut (mapped from spin-glass energy), return optimal energy.
+* **Purpose:** Provide the **true optimum** (for small graphs) to measure the **gap** between RL and optimal solutions.
+
+---
+
+### Cell 8 — RL Environment (Sequential Assignment)
+
+* **Content:** Environment for sequential spin assignment with **reward shaping** \$r\_t = -\Delta H\$.
+* **Purpose:** Cast ground-state search as an **episodic RL** problem with stable local rewards.
+
+---
+
+### Cell 9 — Policy–Value GNN (A2C Style)
+
+* **Content:** GCN backbone with `edge_weight=J`, plus **policy head** (logits for −1/+1) and **value head** (\$V(s)\$).
+* **Purpose:** Actor–critic architecture that encodes graph structure and spin couplings.
+
+---
+
+### Cell 10 — Instance Generator & Permutation Augmentation
+
+* **Content:** Utility to generate graph instances + augmentation by **node permutation**.
+* **Purpose:** Improve **generalization** and **invariance** to node indexing.
+
+---
+
+### Cell 11 — A2C Training Loop (Actor–Critic)
+
+* **Content:** Simple A2C training (policy loss + value loss + entropy reg + gradient clipping) with **curriculum sizes**.
+* **Purpose:** Train GNN policies to **minimize energy** stably without collapse.
+
+---
+
+### Cell 12 — Training Curves
+
+* **Content:** Plot **mean energy** and **mean return** per epoch.
+* **Purpose:** Track training progress and detect stagnation/overfitting.
+
+---
+
+### Cell 13 — Greedy Inference (RL Policy)
+
+* **Content:** Evaluate policy using **greedy actions**; compare with SA on a single instance.
+* **Purpose:** Assess deterministic performance of the RL policy at inference time.
+
+---
+
+### Cell 14 — Batch Evaluation (+ILP for Small Graphs)
+
+* **Content:** Batch evaluation: **RL vs SA**; for small graphs, include **ILP** and compute **relative gap**.
+* **Purpose:** Measure average performance and how close RL is to the optimum.
+
+---
+
+### Cell 15 — Visualization of Evaluation Results
+
+* **Content:** Boxplots **RL vs SA** (small & large graphs), histogram of **RL–ILP gaps**.
+* **Purpose:** Provide **comparative analysis** that is presentation-ready.
+
+---
+
+### Cell 16 — Save Artifacts
+
+* **Content:** Save model `state_dict`, `train_history.json`, and evaluation stats (`.npz`).
+* **Purpose:** Ensure **reproducibility** and facilitate sharing in repos/portfolios.
+
+---
+
+### Cell 17 — (Optional) Replace Backbone with GIN
+
+* **Content:** Implementation of **PolicyValueGIN** (more expressive than GCN).
+* **Purpose:** **Architecture ablation** to study GNN capacity.
+
+---
+
+### Cell 18 — Notes & Next Steps (Markdown)
+
+* **Content:** Ideas for extensions: full A2C, mixed curriculum/topologies, QAOA bridge, etc.
+* **Purpose:** Provide a **roadmap for future research**, making the project appear extensible.
+
+---
+
+### Cell 19 — Checkpointing & Utilities
+
+* **Content:** `Timer` class, `save_ckpt`/`load_ckpt` functions, `checkpoints/` & `artifacts/` dirs.
+* **Purpose:** **Experiment management** (resume runs, save best model).
+
+---
+
+### Cell 20 — Validation Set & Early Stopping
+
+* **Content:** `VALSET`, `mean_val_energy`, and A2C training with **early stopping**.
+* **Purpose:** Prevent **overfitting**, select best model by validation energy.
+
+---
+
+### Cell 21 — Plot Loss Terms & Validation Energy
+
+* **Content:** Curves of **policy/value/entropy losses** and **train vs val energy**.
+* **Purpose:** Diagnose **training stability** and regularization trade-offs.
+
+---
+
+### Cell 22 — Local Refinement (Zero-T Hill-Climb)
+
+* **Content:** Apply greedy **1-opt refinement** on RL output.
+* **Purpose:** Cheap **post-processing** that often improves energy.
+
+---
+
+### Cell 23 — Cross-Topology Generalization
+
+* **Content:** Evaluate on **Grid** & **3-regular** graphs (RL, RL+refine, SA) + boxplots.
+* **Purpose:** Test **transferability** across topologies (robustness indicator).
+
+---
+
+### Cell 24 — Size Scaling Study
+
+* **Content:** Plot **energy per edge vs \$n\$** for RL, RL+refine, and SA.
+* **Purpose:** Analyze **scaling behavior** as graph size grows.
+
+---
+
+### Cell 25 — Ablation Tests
+
+* **Content:** Evaluate without \$J\$ weights or without degree features.
+* **Purpose:** Assess which **input components** truly matter.
+
+---
+
+### Cell 26 — Mini Hyper-Parameter Sweep
+
+* **Content:** Small sweep (hidden size, entropy coefficient) with early stopping.
+* **Purpose:** **Lightweight tuning** for structured performance improvement.
+
+---
+
+### Cell 27 — Save Best Model & CSV Summary
+
+* **Content:** Save **final checkpoint**, `train_history2.json`, and summary CSV of key metrics.
+* **Purpose:** Ready for **README/poster** inclusion and cross-run comparison.
+
+---
+
+### Cell 28 — (Optional) QAOA Baseline (p=1)
+
+* **Content:** If `qiskit` is available, compute **QAOA p=1** for small graphs; compare with RL/SA.
+* **Purpose:** Provide a **bridge to quantum algorithms**, relevant to combinatorial optimization.
+
+---
+
+### Cell 29 — Quick Report (Markdown)
+
+* **Content:** Auto-generate short report from evaluation results.
+* **Purpose:** Facilitate **mini-paper/poster writing** with consistent numbers.
+
+---
+
+### Cell 30 — Export Figures (Poster-Ready)
+
+* **Content:** Save key plots (energy curves, scaling) to `figs/`.
+* **Purpose:** **Presentation-ready** results without manual re-plotting.
+
+---
+
+## Project Overview
+
+* **Physics → Optimization:** Solve the spin glass ground state (Ising Hamiltonian) as a **Max-Cut problem**.
+* **Physics-aware ML method:** **GNN + RL (A2C)** exploits graph structure and couplings \$J\$.
+* **Experimental rigor:** Includes **SA baseline**, **ILP optimum**, **local refinement**, and **generalization tests** (across topology and size).
+* **Portfolio readiness:** Artifacts, checkpoints, CSVs, **reports and figures** → easy packaging into **GitHub** and **poster** form.
